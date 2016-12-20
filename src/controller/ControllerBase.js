@@ -1,25 +1,18 @@
 import GameError from '../exception/GameError';
+import mainConfig from '../../config/main';
 
-export default ControllerBase {
+export default class ControllerBase {
   before(req) {
     if(false === this.isAuthorized(req)) {
-      throw new GameError('認証されていないアクセスです', 'NO_AUTHRITHED', 401);
+      throw new GameError('認証されていないアクセスです', 'UNAUTHORIZED', 401);
     }
   }
 
   isAuthorized(req) {
-    return true;
-  }
-
-  done(req, res, fn) {
-    try {
-      this.before(req);
-      fn(res);
-    } catch(err) {
-      res.locals.message = err.message;
-      res.locals.error = err;
-      res.status(err.status || 500);
-      res.json({'error': 'error'});
+    const accessId = req.get('x-access-id');
+    if (typeof accessId === "undefined") {
+      return false;
     }
+    return parseInt(accessId, 10) === mainConfig.access_id;
   }
 }

@@ -4,8 +4,7 @@ import logger from 'morgan';
 import bodyParser from 'body-parser';
 import 'babel-polyfill';
 
-import {router as index} from './routes/index';
-import {router as users} from './routes/users';
+import {router as player} from './routes/player';
 
 const app = express();
 
@@ -19,8 +18,7 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(express.static(path.join(__dirname, 'public')));
 
-app.use('/', index);
-app.use('/users', users);
+app.use('/player', player);
 
 // catch 404 and forward to error handler
 app.use((req, res, next) => {

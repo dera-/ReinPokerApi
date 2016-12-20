@@ -14,7 +14,7 @@ export default class SerialCodeDao {
 
   async getByCode(code) {
     const query = 'SELECT * FROM serial_code WHERE code = ?';
-    const result = await this.dbConnection.execQueryInPool(mysql.format(query, [code]));
+    const data = await this.dbConnection.execQueryInPool(mysql.format(query, [code]));
     return data.length === 0 ? {} : data[0];
   }
 

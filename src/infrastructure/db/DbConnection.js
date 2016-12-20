@@ -42,8 +42,12 @@ export default class DbConnection {
     return new Promise((resolve, reject) => {
       this.connection.query(query, (error, result) => {
         if (error) {
+          console.log('できない。。');
+          console.log(error);
           reject(error);
         }
+        console.log('できた');
+        console.log(result);
         resolve(result);
       });
     });
