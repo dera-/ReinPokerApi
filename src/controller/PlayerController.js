@@ -4,32 +4,28 @@ import PlayerService from '../domain/service/PlayerService';
 
 export default class PlayerController extends ControllerBase {
   async get(request, response) {
-    const callback = (req, res) => {
-      const serialCode = this.getSerialCode(req);
+    this.beforePromise(request).then(() =>{
+      const serialCode = this.getSerialCode(request);
       const playerService = new PlayerService();
-      playerService.login(serialCode).then((result)=>{
-        res.status(200);
-        res.json({'data': result});
+      return Promise.resolve(playerService.login(serialCode));
+    }).then((result)=>{
+        response.status(200);
+        response.json({'data': result});
+      }).catch((error)=>{
+        this.showError(response, error);
       });
-    };
-    await this.done(request, response, callback);
   }
 
   post(request, response) {
-      new Promise((resolve)=>{
-        this.before(request);
-        resolve();
-      }).then(() => {
+      this.beforePromise(request).then(() => {
         const serialCode = this.getSerialCode(request);
         const playerService = new PlayerService();
-        return Promise.resolve(playerService.register(serialCode))
+        return Promise.resolve(playerService.register(serialCode));
       }).then((result)=>{
         response.status(200);
         response.json({'success': true});
       }).catch((error)=>{
-        console.log(error);
-        response.status(500);
-        response.json({'error': error});
+        this.showError(response, error);
       });
   }
 

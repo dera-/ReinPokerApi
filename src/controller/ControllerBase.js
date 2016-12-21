@@ -8,11 +8,24 @@ export default class ControllerBase {
     }
   }
 
+  beforePromise(request) {
+    return new Promise(resolve => {
+      this.before(request);
+      resolve();
+    });
+  }
+
   isAuthorized(req) {
     const accessId = req.get('x-access-id');
     if (typeof accessId === "undefined") {
       return false;
     }
     return parseInt(accessId, 10) === mainConfig.access_id;
+  }
+
+  showError(response, error) {
+      console.log(error);
+      response.status(error.status || 500);
+      response.json({'error': error});
   }
 }
