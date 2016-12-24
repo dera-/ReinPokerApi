@@ -8,7 +8,7 @@ import AccessTokenModelFactory from '../factory/AccessTokenModelFactory';
 import LearningFileService from './LearningFileService';
 import LearningDataModel from '../model/LearningDataModel';
 
-export default class PlayerService {
+export default class PlayerAiService {
   constructor() {
     this.playerDao = new PlayerDao();
     this.playerAiDao = new PlayerAiDao();
@@ -22,7 +22,7 @@ export default class PlayerService {
    * @Param String code シリアルコード
    * @Return String
    */
-  async login(code, aiData, learningData, ip) {
+  async getRandomAiData() {
     const userId = await this.serialCodeDao.getUserIdByCode(code);
     if (userId === null) {
       throw new GameError('該当のユーザーが見つかりませんでした', 'NOT_FOUND', 404);
@@ -51,7 +51,7 @@ export default class PlayerService {
    * @Param String code シリアルコード
    * @Return String
    */
-  async register(code, aiData, learningData, ip) {
+  async updateResults(id, results) {
     let userId = null;
     const record = await this.serialCodeDao.getByCode(code);
     if (Object.keys(record).length === 0 || record.user_id !== null) {

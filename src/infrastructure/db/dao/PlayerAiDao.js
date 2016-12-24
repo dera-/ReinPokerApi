@@ -7,9 +7,28 @@ export default class PlayerAiDao {
   }
 
   async insert(aiData) {
-    const query = 'INSERT INTO player_ai (player_id, name, file_key) VALUES (?, ?, ?)';
-    const result = await this.dbConnection.execQueryInConnection(mysql.format(query, [aiData.player_id, aiData.name, aiData.file_key]));
-    return result;
+    const query = 'INSERT INTO player_ai (player_id, name, teach_count, hand_count, pot_get_count, fold_count, right_fold_count) VALUES (?, ?, ?, ?, ?, ?, ?)';
+    const result = await this.dbConnection.execQueryInConnection(mysql.format(
+      query,
+      [aiData.player_id, aiData.name, aiData.teach_count, aiData.hand_count, aiData.pot_get_count, aiData.fold_count, aiData.right_fold_count]
+    ));
+    return result.insertId;
+  }
+
+  async updateData(aiData) {
+    const query = 'UPDATE player_ai SET name = ?, teach_count = ?, hand_count = ?, pot_get_count = ?, fold_count = ?, right_fold_count = ? WHERE player_id = ?';
+    await this.dbConnection.execQueryInConnection(mysql.format(
+      query,
+      [aiData.name, aiData.teach_count, aiData.hand_count, aiData.pot_get_count, aiData.fold_count, aiData.right_fold_count, aiData.player_id]
+    ));
+  }
+
+  async updateResults(aiData) {
+    const query = 'UPDATE player_ai SET battle_count = ?, win_count = ? WHERE player_id = ?';
+    await this.dbConnection.execQueryInConnection(mysql.format(
+      query,
+      [aiData.battle_count, aiData.win_count, aiData.player_id]
+    ));
   }
 
   async get(id) {

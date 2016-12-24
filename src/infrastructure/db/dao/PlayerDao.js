@@ -10,7 +10,7 @@ export default class PlayerDao {
     const query = 'INSERT INTO player (name, money, paid, created_at, updated_at) VALUES (?, ?, ?, NOW(), NOW())';
     console.log(userData);
     const result = await this.dbConnection.execQueryInConnection(mysql.format(query, [userData.name, userData.money, userData.paid]));
-    return result;
+    return result.insertId;
   }
 
   async get(id) {

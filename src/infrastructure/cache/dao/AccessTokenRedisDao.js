@@ -1,4 +1,6 @@
 import RedisClient from '../RedisClient';
+import AccessTokenModel from '../../../domain/model/AccessTokenModel';
+import AccessTokenModelFactory from '../../../domain/factory/AccessTokenModelFactory';
 
 const EXPIRE_TIME = 1800;
 export default class AccessTokenRedisDao {
@@ -7,19 +9,20 @@ export default class AccessTokenRedisDao {
     this.redisClient = new RedisClient();
   }
 
-  set(userId, token) {
-    this.redisClient.setEx(this.getRedisKey(userId), token, EXPIRE_TIME);
+  async set(ip, model) {
+    await this.redisClient.setEx(this.getRedisKey(ip), model.getData(), EXPIRE_TIME);
   }
 
-  get(userId) {
-    return this.redisClient.get(this.getRedisKey(userId));
+  async get(ip) {
+    const data = await this.redisClient.get(this.getRedisKey(ip));
+    return AccessTokenModelFactory.get(data.user_id, data.access_token);
   }
 
-  expire(userId) {
-    this.redisClient.expire(this.getRedisKey(userId), EXPIRE_SECOND);
+  async expire(ip) {
+    await this.redisClient.expire(this.getRedisKey(ip), EXPIRE_SECOND);
   }
 
-  getRedisKey(userId) {
-    return 'rein_poker:acces_token:user_id' + userId;
+  getRedisKey(ip) {
+    return 'rein_poker:acces_token:ip' + userId;
   }
 }

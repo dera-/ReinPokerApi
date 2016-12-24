@@ -5,12 +5,12 @@ import PlayerController from '../controller/PlayerController';
 export const router = express.Router();
 const playerController = new PlayerController();
 
-/* GET */
-router.get('/', (req, res) => {
-  playerController.get(req, res);
+/* ログイン */
+router.post('/login', (req, res) => {
+  playerController.login(req, res);
 });
 
-/* POST */
+/* 新規登録 */
 router.post('/', (req, res) => {
-  playerController.post(req, res);
+  playerController.register(req, res);
 });

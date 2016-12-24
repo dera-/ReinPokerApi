@@ -4,8 +4,8 @@ import PlayerService from '../domain/service/PlayerService';
 import PlayerAiDataLoginValidation from '../validation/PlayerAiDataLoginValidation';
 import LearningDataValidation from '../validation/LearningDataValidation';
 
-export default class PlayerController extends ControllerBase {
-  login(request, response) {
+export default class PlayerAiController extends ControllerBase {
+  getRandom(request, response) {
     this.beforePromise(request).then(() => {
       const aiData = request.body.ai_data;
       const learningData = request.body.learning_data;
@@ -25,7 +25,7 @@ export default class PlayerController extends ControllerBase {
       });
   }
 
-  register(request, response) {
+  updateResults(request, response) {
     this.beforePromise(request).then(() => {
       const aiData = request.body.ai_data;
       const learningData = request.body.learning_data;
