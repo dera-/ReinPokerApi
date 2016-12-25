@@ -15,6 +15,9 @@ export default class AccessTokenRedisDao {
 
   async get(ip) {
     const data = await this.redisClient.get(this.getRedisKey(ip));
+    if (false === data.hasOwnProperty('user_id') || false === data.hasOwnProperty('access_token')) {
+      return null;
+    }
     return AccessTokenModelFactory.get(data.user_id, data.access_token);
   }
 

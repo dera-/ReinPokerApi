@@ -1,25 +1,20 @@
 import ControllerBase from './ControllerBase.js';
 import GameError from '../exception/GameError';
-import PlayerService from '../domain/service/PlayerService';
-import PlayerAiDataLoginValidation from '../validation/PlayerAiDataLoginValidation';
-import LearningDataValidation from '../validation/LearningDataValidation';
+import PlayerAiService from '../domain/service/PlayerAIService';
+import AccessTokenRedisDao from '../infrastructure/cache/dao/AccessTokenRedisDao';
+import AccessTokenModel from '../domain/model/AccessTokenModel';
+import PlayerAiResultsValidation from '../validation/PlayerAiResultsValidation';
 
 export default class PlayerAiController extends ControllerBase {
   getRandom(request, response) {
     this.beforePromise(request).then(() => {
-      const aiData = request.body.ai_data;
-      const learningData = request.body.learning_data;
-      const playerAiDataLoginValidation = new PlayerAiDataLoginValidation();
-      const learningDataValidation = new LearningDataValidation();
-      return Promise.all(playerAiDataLoginValidation.run(aiData), learningDataValidation.run(learningData));
-    }).then((aiData, learningData) => {
-      const ip = request.connection.remoteAddress;
-      const serialCode = this.getSerialCode(request);
-      const playerService = new PlayerService();
-      return Promise.resolve(playerService.login(serialCode, aiData, learningData, ip));
-    }).then((result) => {
+      return Promise.resolve(this.getAuthorizedUserId(request));
+    }).then((userId) => {
+      const playerAiService = new PlayerAiService();
+      return Promise.resolve(playerAiService.getRandom(userId));
+    }).then((data) => {
         response.status(200);
-        response.json({'success': true, 'data': result});
+        response.json({'success': true, 'data': data});
       }).catch((error) => {
         this.showError(response, error);
       });
@@ -27,29 +22,32 @@ export default class PlayerAiController extends ControllerBase {
 
   updateResults(request, response) {
     this.beforePromise(request).then(() => {
-      const aiData = request.body.ai_data;
-      const learningData = request.body.learning_data;
-      const playerAiDataLoginValidation = new PlayerAiDataLoginValidation();
-      const learningDataValidation = new LearningDataValidation();
-      return Promise.all(playerAiDataLoginValidation.run(aiData), learningDataValidation.run(learningData));
-    }).then((aiData, learningData) => {
-      const ip = request.connection.remoteAddress;
-      const serialCode = this.getSerialCode(request);
-      const playerService = new PlayerService();
-      return Promise.resolve(playerService.register(serialCode, aiData, learningData, ip));
-    }).then((result) => {
+      const results = request.body.results;
+      const playerAiResultsValidation = new PlayerAiResultsValidation();
+      return Promise.resolve(this.getAuthorizedUserId(request), playerAiResultsValidation.run(results));
+    }).then((userId, results) => {
+      const playerAiService = new PlayerAiService();
+      return Promise.resolve(playerAiService.updateResults(userId, results));
+    }).then(() => {
       response.status(200);
-      response.json({'success': true, 'data': result});
+      response.json({'success': true});
     }).catch((error) => {
       this.showError(response, error);
     });
   }
 
-  getSerialCode(req) {
-    const serialCode = req.get('x-serial-code');
-    if (typeof serialCode === "undefined") {
+  async getAuthorizedUserId(req) {
+    const requestAccessToken = req.get('x-access-token');
+    if (typeof requestAccessToken === "undefined") {
       throw GameError('認証されていないアクセスです', 'UNAUTHORIZED', 401);
     }
-    return serialCode;
+    const ip = req.connection.remoteAddress;
+    const accessTokenRedisDao = new AccessTokenRedisDao();
+    const actualAccessTokenModel = await accessTokenRedisDao.get(ip);
+    if (actualAccessTokenModel === null || actualAccessTokenModel.accessToken !== requestAccessToken) {
+      throw GameError('認証されていないアクセスです', 'UNAUTHORIZED', 401);
+    }
+    accessTokenRedisDao.expire(ip);
+    return actualAccessTokenModel.userId;
   }
 }

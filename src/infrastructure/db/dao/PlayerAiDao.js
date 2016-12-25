@@ -36,4 +36,16 @@ export default class PlayerAiDao {
     const data = await this.dbConnection.execQueryInPool(mysql.format(query, [id]));
     return data.length === 0 ? {} : data[0];
   }
+
+  async getByPlayerId(playerId) {
+    const query = 'SELECT * FROM player_ai WHERE player_id = ?';
+    const data = await this.dbConnection.execQueryInPool(mysql.format(query, [playerId]));
+    return data.length === 0 ? {} : data[0];
+  }
+
+  async getCount() {
+    const query = 'SELECT COUNT(id) FROM player_ai';
+    const data = await this.dbConnection.execQueryInPool(mysql.format(query));
+    return data.length === 0 ? 0 : intval(data[0]);
+  }
 }
