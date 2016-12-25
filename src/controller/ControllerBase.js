@@ -23,6 +23,11 @@ export default class ControllerBase {
     return parseInt(accessId, 10) === mainConfig.access_id;
   }
 
+  getRequestBody(request) {
+    const body = Object.keys(request.body);
+    return JSON.parse(body[0]);
+  }
+
   showError(response, error) {
       console.log(error);
       response.status(error.status || 500);

@@ -5,6 +5,6 @@ export default class AccessTokenModel {
   }
 
   getData() {
-    return {user_id: this.userId, access_token: this.accessToken};
+    return {"user_id": this.userId, "access_token": this.accessToken};
   }
 }

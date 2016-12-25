@@ -15,6 +15,7 @@ export default class AccessTokenRedisDao {
 
   async get(ip) {
     const data = await this.redisClient.get(this.getRedisKey(ip));
+    console.log(data);
     if (false === data.hasOwnProperty('user_id') || false === data.hasOwnProperty('access_token')) {
       return null;
     }
@@ -22,10 +23,10 @@ export default class AccessTokenRedisDao {
   }
 
   async expire(ip) {
-    await this.redisClient.expire(this.getRedisKey(ip), EXPIRE_SECOND);
+    await this.redisClient.expire(this.getRedisKey(ip), EXPIRE_TIME);
   }
 
   getRedisKey(ip) {
-    return 'rein_poker:acces_token:ip' + userId;
+    return 'rein_poker:acces_token:ip' + ip;
   }
 }

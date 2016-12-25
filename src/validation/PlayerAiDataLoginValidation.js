@@ -1,6 +1,7 @@
+import ValidationBase from './ValidationBase';
 import * as ValidationType from './ValidationType.js';
 
-export default class PlayerAiDataLoginValidation {
+export default class PlayerAiDataLoginValidation extends ValidationBase {
   getValidationList() {
     return {
       'name':[ValidationType.IS_REQUIRED, ValidationType.IS_STRING],

@@ -2,6 +2,8 @@ import fs from 'fs';
 import config from '../../../config/main';
 import LearningDataModel from '../model/LearningDataModel';
 
+const PREFIX = 'learning_';
+
 export default class LearningFileService {
   saveData(userId, learningDataModel) {
     const dirName = config.dir.learning;

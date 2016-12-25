@@ -27,20 +27,22 @@ export default class PlayerService {
     if (userId === null) {
       throw new GameError('該当のユーザーが見つかりませんでした', 'NOT_FOUND', 404);
     }
+    // @HACK ユーザー存在チェックだがなくてもいい気がする
     const user = await this.playerDao.get(userId);
     if (Object.keys(user).length === 0) {
       throw new GameError('該当のユーザーは削除されていました', 'CONFLICT', 409);
     }
     try{
       await this.gameDb.beginTransaction();
-      await this.playerAiDao.updateDate(aiData);
+      aiData['player_id'] = userId;
+      await this.playerAiDao.updateData(aiData);
       await this.gameDb.commit();
     } catch(ex) {
       this.gameDb.rollback();
       throw new GameError('AIデータの更新に失敗しました', 'INTERNAL_ERORR', 500);
     }
     // 学習データセーブ
-    await this.learningFileService.save(userId, this.getLearningDataModel(learningData));
+    await this.learningFileService.saveData(userId, this.getLearningDataModel(learningData));
 
     // トークン発行
     const token = await this.getAccessToken(ip, userId);
@@ -59,7 +61,7 @@ export default class PlayerService {
     }
     try{
       await this.gameDb.beginTransaction();
-      userId = await this.playerDao.insert({name: 'プレイヤー君', money: 10000, paid: true});
+      userId = await this.playerDao.insert({name: aiData.name, money: 10000, paid: true});  //moneyとpaidはとりあえずべた書き(未実装要素なので)
       aiData['player_id'] = userId;
       await this.playerAiDao.insert(aiData);
       await this.serialCodeDao.updateUserId(record.id, userId);
@@ -69,7 +71,7 @@ export default class PlayerService {
       throw new GameError('ユーザーデータ登録に失敗しました', 'INTERNAL_ERORR', 500);
     }
     // 学習データセーブ
-    await this.learningFileService.save(userId, this.getLearningDataModel(learningData));
+    await this.learningFileService.saveData(userId, this.getLearningDataModel(learningData));
 
     // トークン発行
     const token = await this.getAccessToken(ip, userId);
@@ -79,6 +81,7 @@ export default class PlayerService {
   async getAccessToken(ip, userId) {
     try {
       const tokenModel = AccessTokenModelFactory.generate(userId);
+      console.log(tokenModel.getData());
       await this.accessTokenRedisDao.set(ip, tokenModel);
       return tokenModel.accessToken;
     } catch(err) {

@@ -4,7 +4,8 @@ import logger from 'morgan';
 import bodyParser from 'body-parser';
 import 'babel-polyfill';
 
-import {router as player} from './routes/player';
+import {router as player} from './routes/Player';
+import {router as playerai} from './routes/PlayerAi';
 
 const app = express();
 
@@ -19,6 +20,7 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/player', player);
+app.use('/player-ai', playerai);
 
 // catch 404 and forward to error handler
 app.use((req, res, next) => {

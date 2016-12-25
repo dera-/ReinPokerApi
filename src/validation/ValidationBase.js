@@ -3,12 +3,13 @@ import * as ValidationType from './ValidationType.js';
 
 export default class ValidationBase {
   run(data) {
-    validationList = this.getValidationList();
-    invalidList = Object.keys(validationList).filter(key => {
-      return validationList[key].some(rule => false === this.validate(rule, data[key]));
+    const validationList = this.getValidationList();
+    const invalidList = Object.keys(validationList).filter(key => {
+      return validationList[key].some(rule => false === this.validate(data[key], rule));
     });
     if (invalidList.length > 0) {
-      throw new GameError('パラメーターが不正です', 'BAD_REQUEST', 400);
+      const errorParamStr = invalidList.join(',');
+      throw new GameError('パラメーターが不正です(エラー：'+ errorParamStr +')', 'BAD_REQUEST', 400);
     }
     return data;
   }

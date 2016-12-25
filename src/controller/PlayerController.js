@@ -7,16 +7,17 @@ import LearningDataValidation from '../validation/LearningDataValidation';
 export default class PlayerController extends ControllerBase {
   login(request, response) {
     this.beforePromise(request).then(() => {
-      const aiData = request.body.ai_data;
-      const learningData = request.body.learning_data;
+      const requestBody = this.getRequestBody(request);
+      const aiData = requestBody.ai_data;
+      const learningData = requestBody.learning_data;
       const playerAiDataLoginValidation = new PlayerAiDataLoginValidation();
       const learningDataValidation = new LearningDataValidation();
-      return Promise.all(playerAiDataLoginValidation.run(aiData), learningDataValidation.run(learningData));
-    }).then((aiData, learningData) => {
+      return Promise.all([playerAiDataLoginValidation.run(aiData), learningDataValidation.run(learningData)]);
+    }).then((values) => {
       const ip = request.connection.remoteAddress;
       const serialCode = this.getSerialCode(request);
       const playerService = new PlayerService();
-      return Promise.resolve(playerService.login(serialCode, aiData, learningData, ip));
+      return Promise.resolve(playerService.login(serialCode, values[0], values[1], ip));
     }).then((result) => {
         response.status(200);
         response.json({'success': true, 'data': result});
@@ -27,16 +28,18 @@ export default class PlayerController extends ControllerBase {
 
   register(request, response) {
     this.beforePromise(request).then(() => {
-      const aiData = request.body.ai_data;
-      const learningData = request.body.learning_data;
+      const requestBody = this.getRequestBody(request);
+      const aiData = requestBody.ai_data;
+      const learningData = requestBody.learning_data;
+      console.log(learningData);
       const playerAiDataLoginValidation = new PlayerAiDataLoginValidation();
       const learningDataValidation = new LearningDataValidation();
-      return Promise.all(playerAiDataLoginValidation.run(aiData), learningDataValidation.run(learningData));
-    }).then((aiData, learningData) => {
+      return Promise.all([playerAiDataLoginValidation.run(aiData), learningDataValidation.run(learningData)]);
+    }).then((values) => {
       const ip = request.connection.remoteAddress;
       const serialCode = this.getSerialCode(request);
       const playerService = new PlayerService();
-      return Promise.resolve(playerService.register(serialCode, aiData, learningData, ip));
+      return Promise.resolve(playerService.register(serialCode, values[0], values[1], ip));
     }).then((result) => {
       response.status(200);
       response.json({'success': true, 'data': result});
@@ -48,7 +51,7 @@ export default class PlayerController extends ControllerBase {
   getSerialCode(req) {
     const serialCode = req.get('x-serial-code');
     if (typeof serialCode === "undefined") {
-      throw GameError('認証されていないアクセスです', 'UNAUTHORIZED', 401);
+      throw new GameError('認証されていないアクセスです', 'UNAUTHORIZED', 401);
     }
     return serialCode;
   }

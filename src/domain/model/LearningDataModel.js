@@ -4,6 +4,6 @@ export default class LearningDataModel {
   }
 
   getData(key) {
-    freturn this.data.hasOwnProperty(key) ? this.data[key] : '';
+    return this.data.hasOwnProperty(key) ? this.data[key] : '';
   }
 }

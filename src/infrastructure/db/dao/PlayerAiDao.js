@@ -16,6 +16,7 @@ export default class PlayerAiDao {
   }
 
   async updateData(aiData) {
+    console.log(aiData);
     const query = 'UPDATE player_ai SET name = ?, teach_count = ?, hand_count = ?, pot_get_count = ?, fold_count = ?, right_fold_count = ? WHERE player_id = ?';
     await this.dbConnection.execQueryInConnection(mysql.format(
       query,
@@ -43,9 +44,9 @@ export default class PlayerAiDao {
     return data.length === 0 ? {} : data[0];
   }
 
-  async getCount() {
-    const query = 'SELECT COUNT(id) FROM player_ai';
+  async getMaxId() {
+    const query = 'SELECT MAX(id) FROM player_ai';
     const data = await this.dbConnection.execQueryInPool(mysql.format(query));
-    return data.length === 0 ? 0 : intval(data[0]);
+    return data.length === 0 || false === data[0].hasOwnProperty('MAX(id)') ? 0 : data[0]['MAX(id)'];
   }
 }
