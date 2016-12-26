@@ -31,7 +31,6 @@ export default class PlayerController extends ControllerBase {
       const requestBody = this.getRequestBody(request);
       const aiData = requestBody.ai_data;
       const learningData = requestBody.learning_data;
-      console.log(learningData);
       const playerAiDataLoginValidation = new PlayerAiDataLoginValidation();
       const learningDataValidation = new LearningDataValidation();
       return Promise.all([playerAiDataLoginValidation.run(aiData), learningDataValidation.run(learningData)]);

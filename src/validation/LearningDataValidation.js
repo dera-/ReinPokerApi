@@ -32,6 +32,8 @@ export default class LearningDataValidation extends ValidationBase {
 
   isRightFormat(data, count) {
     const dataArray = data.split("\n");
+    console.log('expect:'+count);
+    console.log('actual:'+dataArray.length);
     return dataArray.length === count;
   }
 }
