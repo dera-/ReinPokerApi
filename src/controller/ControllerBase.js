@@ -24,8 +24,7 @@ export default class ControllerBase {
   }
 
   getRequestBody(request) {
-    const body = Object.keys(request.body);
-    return JSON.parse(body[0]);
+    return request.body;
   }
 
   showError(response, error) {

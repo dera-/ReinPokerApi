@@ -42,7 +42,7 @@ export default class PlayerAiController extends ControllerBase {
     if (typeof requestAccessToken === "undefined") {
       throw new GameError('認証されていないアクセスです', 'UNAUTHORIZED', 401);
     }
-    const ip = req.connection.remoteAddress;
+    const ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
     const accessTokenRedisDao = new AccessTokenRedisDao();
     const actualAccessTokenModel = await accessTokenRedisDao.get(ip);
     if (actualAccessTokenModel === null || actualAccessTokenModel.accessToken !== requestAccessToken) {

@@ -14,7 +14,7 @@ export default class PlayerController extends ControllerBase {
       const learningDataValidation = new LearningDataValidation();
       return Promise.all([playerAiDataLoginValidation.run(aiData), learningDataValidation.run(learningData)]);
     }).then((values) => {
-      const ip = request.connection.remoteAddress;
+      const ip = request.headers['x-forwarded-for'] || request.connection.remoteAddress;
       const serialCode = this.getSerialCode(request);
       const playerService = new PlayerService();
       return Promise.resolve(playerService.login(serialCode, values[0], values[1], ip));
@@ -35,7 +35,7 @@ export default class PlayerController extends ControllerBase {
       const learningDataValidation = new LearningDataValidation();
       return Promise.all([playerAiDataLoginValidation.run(aiData), learningDataValidation.run(learningData)]);
     }).then((values) => {
-      const ip = request.connection.remoteAddress;
+      const ip = request.headers['x-forwarded-for'] || request.connection.remoteAddress;
       const serialCode = this.getSerialCode(request);
       const playerService = new PlayerService();
       return Promise.resolve(playerService.register(serialCode, values[0], values[1], ip));
